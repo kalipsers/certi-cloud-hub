@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
+import { NewCertificateModal } from "@/components/NewCertificateModal";
 
 const MOCK_CERTIFICATES = [
   {
@@ -31,8 +32,26 @@ const MOCK_CERTIFICATES = [
   },
 ];
 
+const MOCK_CLIENTS = [
+  {
+    id: 1,
+    name: "Acme Corp",
+    contact: "John Doe",
+    email: "john@acme.com",
+    certificates: 3,
+  },
+  {
+    id: 2,
+    name: "TechStart Inc",
+    contact: "Jane Smith",
+    email: "jane@techstart.com",
+    certificates: 1,
+  },
+];
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const filteredCertificates = MOCK_CERTIFICATES.filter(
     (cert) =>
@@ -49,7 +68,7 @@ const Index = () => {
             Manage and monitor your certificates
           </p>
         </div>
-        <Button className="mt-4 md:mt-0">
+        <Button className="mt-4 md:mt-0" onClick={() => setShowModal(true)}>
           <Plus className="mr-2 h-4 w-4" /> New Certificate
         </Button>
       </div>
@@ -92,6 +111,12 @@ const Index = () => {
           </TableBody>
         </Table>
       </div>
+
+      <NewCertificateModal
+        open={showModal}
+        onOpenChange={setShowModal}
+        clients={MOCK_CLIENTS}
+      />
     </DashboardLayout>
   );
 };

@@ -104,6 +104,9 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>New Certificate</DialogTitle>
+          <DialogDescription>
+            Create a new certificate for your client.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -204,7 +207,7 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
                   {form.date ? format(form.date, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={form.date}
