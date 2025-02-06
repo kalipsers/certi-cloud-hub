@@ -12,52 +12,50 @@ import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 
-const MOCK_CERTIFICATES = [
+const MOCK_USERS = [
   {
     id: 1,
-    name: "SSL Certificate",
-    client: "Acme Corp",
-    issueDate: "2024-01-15",
-    expiryDate: "2025-01-15",
+    name: "Admin User",
+    email: "admin@example.com",
+    role: "Admin",
     status: "Active",
   },
   {
     id: 2,
-    name: "Digital Signature",
-    client: "TechStart Inc",
-    issueDate: "2024-02-01",
-    expiryDate: "2025-02-01",
+    name: "Manager User",
+    email: "manager@example.com",
+    role: "Manager",
     status: "Active",
   },
 ];
 
-const Index = () => {
+const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredCertificates = MOCK_CERTIFICATES.filter(
-    (cert) =>
-      cert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cert.client.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = MOCK_USERS.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <DashboardLayout>
       <div className="md:flex md:items-center md:justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold">Certificates</h2>
+          <h2 className="text-2xl font-bold">Users</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Manage and monitor your certificates
+            Manage system users and their permissions
           </p>
         </div>
         <Button className="mt-4 md:mt-0">
-          <Plus className="mr-2 h-4 w-4" /> New Certificate
+          <Plus className="mr-2 h-4 w-4" /> New User
         </Button>
       </div>
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
         <Input
-          placeholder="Search certificates..."
+          placeholder="Search users..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-9"
@@ -69,22 +67,20 @@ const Index = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Issue Date</TableHead>
-              <TableHead>Expiry Date</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCertificates.map((cert) => (
-              <TableRow key={cert.id}>
-                <TableCell className="font-medium">{cert.name}</TableCell>
-                <TableCell>{cert.client}</TableCell>
-                <TableCell>{cert.issueDate}</TableCell>
-                <TableCell>{cert.expiryDate}</TableCell>
+            {filteredUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
                 <TableCell>
                   <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700">
-                    {cert.status}
+                    {user.status}
                   </span>
                 </TableCell>
               </TableRow>
@@ -96,4 +92,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Users;
