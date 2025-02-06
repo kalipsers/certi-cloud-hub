@@ -214,8 +214,10 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
                   mode="single"
                   selected={form.date}
                   onSelect={(date) => {
-                    setForm(prev => ({ ...prev, date }));
-                    setDateOpen(false);
+                    if (date) {
+                      setForm(prev => ({ ...prev, date }));
+                      setDateOpen(false);
+                    }
                   }}
                   initialFocus
                 />
