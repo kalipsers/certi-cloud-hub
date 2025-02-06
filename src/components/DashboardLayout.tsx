@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  CertificateIcon,
+  Award,
   Users2,
   Building2,
   Menu,
@@ -12,7 +12,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
-  { name: "Certificates", href: "/", icon: CertificateIcon },
+  { name: "Certificates", href: "/", icon: Award },
   { name: "Clients", href: "/clients", icon: Building2 },
   { name: "Users", href: "/users", icon: Users2 },
 ];
