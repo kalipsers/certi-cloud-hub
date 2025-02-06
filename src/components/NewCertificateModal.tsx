@@ -49,6 +49,8 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
     validityDays: 90,
   });
 
+  const [dateOpen, setDateOpen] = useState(false);
+
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -194,7 +196,7 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
 
           <div className="grid gap-2">
             <Label>Start Date</Label>
-            <Popover>
+            <Popover open={dateOpen} onOpenChange={setDateOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
@@ -211,7 +213,10 @@ export function NewCertificateModal({ open, onOpenChange, clients }: NewCertific
                 <Calendar
                   mode="single"
                   selected={form.date}
-                  onSelect={(date) => setForm(prev => ({ ...prev, date }))}
+                  onSelect={(date) => {
+                    setForm(prev => ({ ...prev, date }));
+                    setDateOpen(false);
+                  }}
                   initialFocus
                 />
               </PopoverContent>
