@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import Index from "./pages/Index";
 import Clients from "./pages/Clients";
 import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
+import NotificationSettings from "./pages/NotificationSettings";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/notifications" element={<NotificationSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, ArrowUpDown, Filter } from "lucide-react";
+import { Plus, Search, ArrowUpDown, Filter, Server } from "lucide-react";
 import { useState, useEffect } from "react";
 import { NewCertificateModal } from "@/components/NewCertificateModal";
 import {
@@ -19,7 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, addDays, isBefore } from "date-fns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Certificate {
   id: number;
@@ -56,7 +57,6 @@ const TEMPLATE_CERTIFICATES: Certificate[] = [
     dnsNames: ["*.techstart.com", "techstart.com"],
     author: "Alice Johnson",
   },
-  // ... Adding more template data
   {
     id: 3,
     name: "E-commerce SSL",
@@ -68,10 +68,195 @@ const TEMPLATE_CERTIFICATES: Certificate[] = [
     dnsNames: ["shop.direct", "checkout.shop.direct"],
     author: "Bob Wilson",
   },
-  // ... Adding more certificates (up to 20)
+  {
+    id: 4,
+    name: "Internal Server Cert",
+    client: "GlobalTech Solutions",
+    issueDate: "2024-03-01",
+    expiryDate: "2025-03-01",
+    status: "Active",
+    ipAddresses: ["192.168.2.5"],
+    dnsNames: ["internal.globaltech.net"],
+    author: "Carol Davis",
+  },
+  {
+    id: 5,
+    name: "VPN SSL Certificate",
+    client: "SecureConnect Ltd",
+    issueDate: "2024-03-10",
+    expiryDate: "2025-03-10",
+    status: "Active",
+    ipAddresses: ["10.1.1.1"],
+    dnsNames: ["vpn.secureconnect.com"],
+    author: "David White",
+  },
+  {
+    id: 6,
+    name: "Database Server SSL",
+    client: "DataSafe Systems",
+    issueDate: "2024-02-15",
+    expiryDate: "2025-02-15",
+    status: "Active",
+    ipAddresses: ["172.16.1.10"],
+    dnsNames: ["db.datasafe.net"],
+    author: "Emily Green",
+  },
+  {
+    id: 7,
+    name: "Email Server Certificate",
+    client: "MailCorp Inc",
+    issueDate: "2024-01-25",
+    expiryDate: "2025-01-25",
+    status: "Active",
+    ipAddresses: ["192.168.1.50"],
+    dnsNames: ["mail.mailcorp.com"],
+    author: "Frank Black",
+  },
+  {
+    id: 8,
+    name: "Development Server SSL",
+    client: "CodeCraft Studios",
+    issueDate: "2024-03-20",
+    expiryDate: "2024-12-20",
+    status: "Active",
+    ipAddresses: ["10.0.1.20"],
+    dnsNames: ["dev.codecraft.io"],
+    author: "Grace Taylor",
+  },
+  {
+    id: 9,
+    name: "Staging Environment SSL",
+    client: "WebDev Solutions",
+    issueDate: "2024-02-28",
+    expiryDate: "2025-02-28",
+    status: "Active",
+    ipAddresses: ["172.16.2.30"],
+    dnsNames: ["staging.webdev.net"],
+    author: "Harry Brown",
+  },
+  {
+    id: 10,
+    name: "Test Server Certificate",
+    client: "QA Testing Ltd",
+    issueDate: "2024-03-05",
+    expiryDate: "2024-11-05",
+    status: "Active",
+    ipAddresses: ["192.168.2.80"],
+    dnsNames: ["test.qatesting.com"],
+    author: "Ivy Clark",
+  },
+  {
+    id: 11,
+    name: "Backup Server SSL",
+    client: "DataGuard Systems",
+    issueDate: "2024-01-10",
+    expiryDate: "2025-01-10",
+    status: "Active",
+    ipAddresses: ["10.1.1.5"],
+    dnsNames: ["backup.dataguard.net"],
+    author: "Jack Green",
+  },
+  {
+    id: 12,
+    name: "Disaster Recovery SSL",
+    client: "Resilience Corp",
+    issueDate: "2024-02-05",
+    expiryDate: "2025-02-05",
+    status: "Active",
+    ipAddresses: ["172.16.3.15"],
+    dnsNames: ["dr.resilience.com"],
+    author: "Kelly Blue",
+  },
+  {
+    id: 13,
+    name: "Cloud Server SSL",
+    client: "SkyNet Services",
+    issueDate: "2024-03-15",
+    expiryDate: "2025-03-15",
+    status: "Active",
+    ipAddresses: ["192.168.3.100"],
+    dnsNames: ["cloud.skynet.io"],
+    author: "Liam Grey",
+  },
+  {
+    id: 14,
+    name: "Load Balancer SSL",
+    client: "BalanceTech Inc",
+    issueDate: "2024-02-20",
+    expiryDate: "2024-10-20",
+    status: "Active",
+    ipAddresses: ["10.0.2.50"],
+    dnsNames: ["lb.balancetech.com"],
+    author: "Mia White",
+  },
+  {
+    id: 15,
+    name: "API Gateway SSL",
+    client: "Gateway Solutions",
+    issueDate: "2024-03-25",
+    expiryDate: "2025-03-25",
+    status: "Active",
+    ipAddresses: ["172.16.4.25"],
+    dnsNames: ["api.gateway.net"],
+    author: "Noah Black",
+  },
+  {
+    id: 16,
+    name: "Microservice SSL",
+    client: "ServiceMesh Ltd",
+    issueDate: "2024-01-30",
+    expiryDate: "2025-01-30",
+    status: "Active",
+    ipAddresses: ["192.168.4.120"],
+    dnsNames: ["ms.servicemesh.com"],
+    author: "Olivia Green",
+  },
+  {
+    id: 17,
+    name: "Monitoring System SSL",
+    client: "WatchDog Systems",
+    issueDate: "2024-02-10",
+    expiryDate: "2024-09-10",
+    status: "Active",
+    ipAddresses: ["10.1.2.10"],
+    dnsNames: ["monitor.watchdog.net"],
+    author: "Peter Clark",
+  },
+  {
+    id: 18,
+    name: "Reporting Server SSL",
+    client: "ReportCentral Inc",
+    issueDate: "2024-03-01",
+    expiryDate: "2025-03-01",
+    status: "Active",
+    ipAddresses: ["172.16.5.40"],
+    dnsNames: ["report.reportcentral.com"],
+    author: "Quinn Taylor",
+  },
+  {
+    id: 19,
+    name: "Analytics Platform SSL",
+    client: "DataInsights Ltd",
+    issueDate: "2024-02-15",
+    expiryDate: "2025-02-15",
+    status: "Active",
+    ipAddresses: ["192.168.5.150"],
+    dnsNames: ["analytics.datainsights.io"],
+    author: "Ryan Brown",
+  },
+  {
+    id: 20,
+    name: "AI Server SSL",
+    client: "AISolutions Corp",
+    issueDate: "2024-03-20",
+    expiryDate: "2024-12-20",
+    status: "Active",
+    ipAddresses: ["10.0.3.70"],
+    dnsNames: ["ai.aisolutions.com"],
+    author: "Sophia White",
+  },
 ];
 
-// Initialize localStorage with template data if it doesn't exist
 const initializeLocalStorage = () => {
   const storedCertificates = localStorage.getItem("certificates");
   if (!storedCertificates) {
@@ -131,8 +316,50 @@ const Index = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const totalCertificates = certificates.length;
+  const expiringCertificates = certificates.filter((cert) =>
+    isBefore(new Date(cert.expiryDate), addDays(new Date(), 30))
+  );
+  const expiringCount = expiringCertificates.length;
+
   return (
     <DashboardLayout>
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Certificates
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCertificates}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Expiring in 30 Days
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {expiringCount}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Backend Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center">
+              <Server className="mr-2 h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium">Operational</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="md:flex md:items-center md:justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold">Certificates</h2>
@@ -144,6 +371,48 @@ const Index = () => {
           <Plus className="mr-2 h-4 w-4" /> New Certificate
         </Button>
       </div>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Expiring Certificates</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Expiry Date</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {expiringCertificates.map((cert) => (
+                <TableRow key={cert.id}>
+                  <TableCell className="font-medium">{cert.name}</TableCell>
+                  <TableCell>{cert.client}</TableCell>
+                  <TableCell>
+                    {format(new Date(cert.expiryDate), "MMM dd, yyyy")}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        cert.status === "Active"
+                          ? "default"
+                          : cert.status === "Expired"
+                          ? "destructive"
+                          : "secondary"
+                      }
+                    >
+                      {cert.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <div className="flex gap-4 mb-4">
         <div className="relative flex-1">

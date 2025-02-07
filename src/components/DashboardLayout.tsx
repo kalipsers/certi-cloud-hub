@@ -8,6 +8,7 @@ import {
   Building2,
   Menu,
   X,
+  Bell,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Certificates", href: "/", icon: Award },
   { name: "Clients", href: "/clients", icon: Building2 },
   { name: "Users", href: "/users", icon: Users2 },
+  { name: "Notifications", href: "/notifications", icon: Bell },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
