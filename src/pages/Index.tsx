@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -273,7 +272,7 @@ const Index = () => {
                   <Badge
                     variant={
                       cert.status === "Active"
-                        ? "success"
+                        ? "default"
                         : cert.status === "Expired"
                         ? "destructive"
                         : "secondary"

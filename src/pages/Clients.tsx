@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
+import { NewClientModal } from "@/components/NewClientModal";
 
 const MOCK_CLIENTS = [
   {
@@ -31,6 +33,7 @@ const MOCK_CLIENTS = [
 
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const filteredClients = MOCK_CLIENTS.filter(
     (client) =>
@@ -47,7 +50,7 @@ const Clients = () => {
             Manage your client information
           </p>
         </div>
-        <Button className="mt-4 md:mt-0">
+        <Button className="mt-4 md:mt-0" onClick={() => setShowModal(true)}>
           <Plus className="mr-2 h-4 w-4" /> New Client
         </Button>
       </div>
@@ -84,6 +87,8 @@ const Clients = () => {
           </TableBody>
         </Table>
       </div>
+
+      <NewClientModal open={showModal} onOpenChange={setShowModal} />
     </DashboardLayout>
   );
 };

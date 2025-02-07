@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import { useState } from "react";
+import { NewUserModal } from "@/components/NewUserModal";
 
 const MOCK_USERS = [
   {
@@ -31,6 +33,7 @@ const MOCK_USERS = [
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const filteredUsers = MOCK_USERS.filter(
     (user) =>
@@ -47,7 +50,7 @@ const Users = () => {
             Manage system users and their permissions
           </p>
         </div>
-        <Button className="mt-4 md:mt-0">
+        <Button className="mt-4 md:mt-0" onClick={() => setShowModal(true)}>
           <Plus className="mr-2 h-4 w-4" /> New User
         </Button>
       </div>
@@ -88,6 +91,8 @@ const Users = () => {
           </TableBody>
         </Table>
       </div>
+
+      <NewUserModal open={showModal} onOpenChange={setShowModal} />
     </DashboardLayout>
   );
 };
