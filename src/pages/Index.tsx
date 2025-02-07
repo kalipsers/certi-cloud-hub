@@ -9,9 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, ArrowUpDown, Filter } from "lucide-react";
+import { Plus, Search, ArrowUpDown, Filter, RotateCcw, Ban, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { NewCertificateModal } from "@/components/NewCertificateModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +27,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { addDays, isBefore } from "date-fns";
 import { Server } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Certificate {
   id: number;
@@ -269,12 +276,15 @@ const initializeLocalStorage = () => {
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showRenewModal, setShowRenewModal] = useState(false);
+  const [selectedCertificateId, setSelectedCertificateId] = useState<number | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Certificate | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     initializeLocalStorage();
@@ -300,6 +310,41 @@ const Index = () => {
     if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
     return 0;
   });
+
+  const handleRenew = (id: number) => {
+    setSelectedCertificateId(id);
+    setShowRenewModal(true);
+    // Simulate backend response after 2 seconds
+    setTimeout(() => {
+      setShowRenewModal(false);
+      toast({
+        title: "Certificate Renewed",
+        description: "The certificate has been successfully renewed.",
+      });
+    }, 2000);
+  };
+
+  const handleInvalidate = (id: number) => {
+    setCertificates(prevCerts =>
+      prevCerts.map(cert =>
+        cert.id === id
+          ? { ...cert, status: "Expired" as const }
+          : cert
+      )
+    );
+    toast({
+      title: "Certificate Invalidated",
+      description: "The certificate has been invalidated.",
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== id));
+    toast({
+      title: "Certificate Deleted",
+      description: "The certificate has been permanently deleted.",
+    });
+  };
 
   const filteredCertificates = sortedCertificates.filter((cert) => {
     const matchesSearch =
@@ -429,11 +474,15 @@ const Index = () => {
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredCertificates.map((cert) => (
-              <TableRow key={cert.id}>
+              <TableRow 
+                key={cert.id}
+                className={cert.status === "Expired" ? "opacity-60" : ""}
+              >
                 <TableCell className="font-medium">{cert.name}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
@@ -474,6 +523,35 @@ const Index = () => {
                     {cert.status}
                   </Badge>
                 </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    {cert.status !== "Expired" && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRenew(cert.id)}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleInvalidate(cert.id)}
+                        >
+                          <Ban className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(cert.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -485,6 +563,20 @@ const Index = () => {
         onOpenChange={setShowModal}
         clients={[]}
       />
+
+      <Dialog open={showRenewModal} onOpenChange={setShowRenewModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renewing Certificate</DialogTitle>
+            <DialogDescription>
+              Please wait while we process your request...
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
