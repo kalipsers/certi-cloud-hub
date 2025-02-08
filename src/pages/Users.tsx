@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Search, Edit, RefreshCw, Trash2 } from "lucide-react";
 import { NewUserModal } from "@/components/NewUserModal";
 import { EditUserModal } from "@/components/EditUserModal";
+import { ResetPasswordModal } from "@/components/ResetPasswordModal";
 import {
   Dialog,
   DialogContent,
@@ -64,17 +65,6 @@ const Users = () => {
   const handleDeleteClick = (id: number) => {
     setSelectedUserId(id);
     setShowDeleteModal(true);
-  };
-
-  const handlePasswordReset = async () => {
-    if (!selectedUserId) return;
-    // Simulate backend request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setShowResetModal(false);
-    toast({
-      title: "Password Reset",
-      description: "A password reset email has been sent to the user.",
-    });
   };
 
   const handleDelete = async () => {
@@ -180,24 +170,11 @@ const Users = () => {
         user={selectedUser}
       />
 
-      <Dialog open={showResetModal} onOpenChange={setShowResetModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to reset this user's password? They will receive an email with instructions.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowResetModal(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handlePasswordReset}>
-              Reset Password
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ResetPasswordModal
+        open={showResetModal}
+        onOpenChange={setShowResetModal}
+        userId={selectedUserId ?? undefined}
+      />
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent>
