@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Edit, RefreshCw, Trash2 } from "lucide-react";
 import { NewUserModal } from "@/components/NewUserModal";
+import { EditUserModal } from "@/components/EditUserModal";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +48,8 @@ const Users = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [users, setUsers] = useState(MOCK_USERS);
   const { toast } = useToast();
+
+  const selectedUser = users.find(user => user.id === selectedUserId);
 
   const handleEditClick = (id: number) => {
     setSelectedUserId(id);
@@ -171,6 +173,12 @@ const Users = () => {
       </div>
 
       <NewUserModal open={showModal} onOpenChange={setShowModal} />
+
+      <EditUserModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal}
+        user={selectedUser}
+      />
 
       <Dialog open={showResetModal} onOpenChange={setShowResetModal}>
         <DialogContent>

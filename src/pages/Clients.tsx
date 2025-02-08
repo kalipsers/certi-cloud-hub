@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { NewClientModal } from "@/components/NewClientModal";
+import { EditClientModal } from "@/components/EditClientModal";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +47,8 @@ const Clients = () => {
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [clients, setClients] = useState(MOCK_CLIENTS);
   const { toast } = useToast();
+
+  const selectedClient = clients.find(client => client.id === selectedClientId);
 
   const handleEditClick = (id: number) => {
     setSelectedClientId(id);
@@ -156,6 +158,11 @@ const Clients = () => {
       </div>
 
       <NewClientModal open={showModal} onOpenChange={setShowModal} />
+      <EditClientModal 
+        open={showEditModal} 
+        onOpenChange={setShowEditModal}
+        client={selectedClient}
+      />
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent>
