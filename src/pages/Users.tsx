@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +11,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search, Edit, RefreshCw, Trash2 } from "lucide-react";
 import { NewUserModal } from "@/components/NewUserModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const MOCK_USERS = [
   {
@@ -34,8 +42,52 @@ const MOCK_USERS = [
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [users, setUsers] = useState(MOCK_USERS);
+  const { toast } = useToast();
 
-  const filteredUsers = MOCK_USERS.filter(
+  const handleEditClick = (id: number) => {
+    setSelectedUserId(id);
+    setShowEditModal(true);
+  };
+
+  const handleResetClick = (id: number) => {
+    setSelectedUserId(id);
+    setShowResetModal(true);
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setSelectedUserId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handlePasswordReset = async () => {
+    if (!selectedUserId) return;
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setShowResetModal(false);
+    toast({
+      title: "Password Reset",
+      description: "A password reset email has been sent to the user.",
+    });
+  };
+
+  const handleDelete = async () => {
+    if (!selectedUserId) return;
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setUsers(prevUsers => prevUsers.filter(user => user.id !== selectedUserId));
+    setShowDeleteModal(false);
+    toast({
+      title: "User Deleted",
+      description: "The user has been successfully deleted.",
+    });
+  };
+
+  const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -73,6 +125,7 @@ const Users = () => {
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -86,6 +139,31 @@ const Users = () => {
                     {user.status}
                   </span>
                 </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(user.id)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleResetClick(user.id)}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteClick(user.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -93,6 +171,44 @@ const Users = () => {
       </div>
 
       <NewUserModal open={showModal} onOpenChange={setShowModal} />
+
+      <Dialog open={showResetModal} onOpenChange={setShowResetModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to reset this user's password? They will receive an email with instructions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowResetModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePasswordReset}>
+              Reset Password
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

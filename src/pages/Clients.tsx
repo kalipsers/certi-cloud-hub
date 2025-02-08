@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,9 +11,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { NewClientModal } from "@/components/NewClientModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const MOCK_CLIENTS = [
   {
@@ -34,8 +42,48 @@ const MOCK_CLIENTS = [
 const Clients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+  const [clients, setClients] = useState(MOCK_CLIENTS);
+  const { toast } = useToast();
 
-  const filteredClients = MOCK_CLIENTS.filter(
+  const handleEditClick = (id: number) => {
+    setSelectedClientId(id);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setSelectedClientId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedClientId) return;
+    
+    const client = clients.find(c => c.id === selectedClientId);
+    if (client?.certificates && client.certificates > 0) {
+      toast({
+        title: "Cannot Delete Client",
+        description: "This client has active certificates. Please remove all certificates before deleting.",
+        variant: "destructive",
+      });
+      setShowDeleteModal(false);
+      return;
+    }
+
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setClients(prevClients => prevClients.filter(c => c.id !== selectedClientId));
+    setShowDeleteModal(false);
+    toast({
+      title: "Client Deleted",
+      description: "The client has been successfully deleted.",
+    });
+  };
+
+  const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.contact.toLowerCase().includes(searchTerm.toLowerCase())
@@ -73,6 +121,7 @@ const Clients = () => {
               <TableHead>Contact Person</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Certificates</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -82,6 +131,24 @@ const Clients = () => {
                 <TableCell>{client.contact}</TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell>{client.certificates}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditClick(client.id)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteClick(client.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -89,6 +156,25 @@ const Clients = () => {
       </div>
 
       <NewClientModal open={showModal} onOpenChange={setShowModal} />
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Client</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this client? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

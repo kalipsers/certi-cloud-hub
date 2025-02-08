@@ -285,6 +285,10 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const { toast } = useToast();
+  const [showConfirmRenewModal, setShowConfirmRenewModal] = useState(false);
+  const [showConfirmInvalidateModal, setShowConfirmInvalidateModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     initializeLocalStorage();
@@ -368,6 +372,68 @@ const Index = () => {
     isBefore(new Date(cert.expiryDate), addDays(new Date(), 30))
   );
   const expiringCount = expiringCertificates.length;
+
+  const handleRenewConfirm = (id: number) => {
+    setSelectedCertificateId(id);
+    setShowConfirmRenewModal(true);
+  };
+
+  const handleInvalidateConfirm = (id: number) => {
+    setSelectedCertificateId(id);
+    setShowConfirmInvalidateModal(true);
+  };
+
+  const handleDeleteConfirm = (id: number) => {
+    setSelectedCertificateId(id);
+    setShowConfirmDeleteModal(true);
+  };
+
+  const handleRenewSubmit = async () => {
+    if (!selectedCertificateId) return;
+    setShowConfirmRenewModal(false);
+    setIsLoading(true);
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsLoading(false);
+    toast({
+      title: "Certificate Renewed",
+      description: "The certificate has been successfully renewed.",
+    });
+  };
+
+  const handleInvalidateSubmit = async () => {
+    if (!selectedCertificateId) return;
+    setShowConfirmInvalidateModal(false);
+    setIsLoading(true);
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setCertificates(prevCerts =>
+      prevCerts.map(cert =>
+        cert.id === selectedCertificateId
+          ? { ...cert, status: "Expired" as const }
+          : cert
+      )
+    );
+    toast({
+      title: "Certificate Invalidated",
+      description: "The certificate has been invalidated.",
+    });
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (!selectedCertificateId) return;
+    setShowConfirmDeleteModal(false);
+    setIsLoading(true);
+    // Simulate backend request
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setCertificates(prevCerts => prevCerts.filter(cert => cert.id !== selectedCertificateId));
+    toast({
+      title: "Certificate Deleted",
+      description: "The certificate has been permanently deleted.",
+    });
+  };
 
   return (
     <DashboardLayout>
@@ -530,14 +596,14 @@ const Index = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleRenew(cert.id)}
+                          onClick={() => handleRenewConfirm(cert.id)}
                         >
                           <RotateCcw className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleInvalidate(cert.id)}
+                          onClick={() => handleInvalidateConfirm(cert.id)}
                         >
                           <Ban className="h-4 w-4" />
                         </Button>
@@ -546,7 +612,7 @@ const Index = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(cert.id)}
+                      onClick={() => handleDeleteConfirm(cert.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -558,16 +624,67 @@ const Index = () => {
         </Table>
       </div>
 
-      <NewCertificateModal
-        open={showModal}
-        onOpenChange={setShowModal}
-        clients={[]}
-      />
-
-      <Dialog open={showRenewModal} onOpenChange={setShowRenewModal}>
+      <Dialog open={showConfirmRenewModal} onOpenChange={setShowConfirmRenewModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Renewing Certificate</DialogTitle>
+            <DialogTitle>Renew Certificate</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to renew this certificate?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmRenewModal(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRenewSubmit}>
+              Renew
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showConfirmInvalidateModal} onOpenChange={setShowConfirmInvalidateModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invalidate Certificate</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to invalidate this certificate? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmInvalidateModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleInvalidateSubmit}>
+              Invalidate
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showConfirmDeleteModal} onOpenChange={setShowConfirmDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Certificate</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this certificate? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowConfirmDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteSubmit}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isLoading}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Processing Request</DialogTitle>
             <DialogDescription>
               Please wait while we process your request...
             </DialogDescription>
@@ -577,6 +694,12 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <NewCertificateModal
+        open={showModal}
+        onOpenChange={setShowModal}
+        clients={[]}
+      />
     </DashboardLayout>
   );
 };
