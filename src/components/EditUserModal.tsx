@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,11 +31,21 @@ interface EditUserModalProps {
 }
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [role, setRole] = useState(user?.role || "");
-  const [status, setStatus] = useState(user?.status || "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [status, setStatus] = useState("");
   const { toast } = useToast();
+
+  // Update state when user prop changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+      setRole(user.role);
+      setStatus(user.status);
+    }
+  }, [user]);
 
   const handleSubmit = async () => {
     // Simulate backend request

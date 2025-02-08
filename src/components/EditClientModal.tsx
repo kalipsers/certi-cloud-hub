@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,12 +23,21 @@ interface EditClientModalProps {
 }
 
 export function EditClientModal({ open, onOpenChange, client }: EditClientModalProps) {
-  const [clientName, setClientName] = useState(client?.name || "");
-  const [contactName, setContactName] = useState(client?.contact || "");
-  const [contactEmail, setContactEmail] = useState(client?.email || "");
+  const [clientName, setClientName] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [apiKey, setApiKey] = useState("");
   const { toast } = useToast();
+
+  // Update state when client prop changes
+  useEffect(() => {
+    if (client) {
+      setClientName(client.name);
+      setContactName(client.contact);
+      setContactEmail(client.email);
+    }
+  }, [client]);
 
   const generateApiKey = () => {
     const key = Array.from(crypto.getRandomValues(new Uint8Array(16)))
