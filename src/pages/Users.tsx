@@ -1,16 +1,8 @@
+
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, Edit, RefreshCw, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { NewUserModal } from "@/components/NewUserModal";
 import { EditUserModal } from "@/components/EditUserModal";
 import { ResetPasswordModal } from "@/components/ResetPasswordModal";
@@ -22,23 +14,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-
-const MOCK_USERS = [
-  {
-    id: 1,
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Manager User",
-    email: "manager@example.com",
-    role: "Manager",
-    status: "Active",
-  },
-];
+import { MOCK_USERS } from "@/types/user";
+import { UsersTable } from "@/components/users/UsersTable";
+import { SearchBar } from "@/components/users/SearchBar";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,68 +77,14 @@ const Users = () => {
         </Button>
       </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-        <Input
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+      <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700">
-                    {user.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditClick(user.id)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleResetClick(user.id)}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteClick(user.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <UsersTable
+        users={filteredUsers}
+        onEdit={handleEditClick}
+        onReset={handleResetClick}
+        onDelete={handleDeleteClick}
+      />
 
       <NewUserModal open={showModal} onOpenChange={setShowModal} />
 
