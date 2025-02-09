@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,6 +27,33 @@ const Login = () => {
       if (error) throw error;
 
       navigate("/");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Check your email for the confirmation link",
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -72,8 +99,8 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center">
       <div className="mx-auto w-full max-w-sm space-y-6 p-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Login</h1>
-          <p className="text-gray-500">Enter your credentials to continue</p>
+          <h1 className="text-3xl font-bold">Welcome</h1>
+          <p className="text-gray-500">Sign in or create an account to continue</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
@@ -97,9 +124,20 @@ const Login = () => {
               required
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
+          <div className="space-y-4">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Loading..." : "Sign In"}
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full"
+              onClick={handleSignUp}
+              disabled={isLoading}
+            >
+              Create Account
+            </Button>
+          </div>
         </form>
         <div className="text-center text-sm">
           <button
