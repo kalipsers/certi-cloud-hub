@@ -5,6 +5,13 @@ export interface User {
   email: string;
   role: string;
   status: string;
+  permissions?: {
+    createCertificate: boolean;
+    renewCertificate: boolean;
+    viewCertificates: boolean;
+    invalidateCertificate: boolean;
+    deleteCertificate: boolean;
+  };
 }
 
 export const MOCK_USERS: User[] = [
@@ -14,6 +21,13 @@ export const MOCK_USERS: User[] = [
     email: "admin@example.com",
     role: "Admin",
     status: "Active",
+    permissions: {
+      createCertificate: true,
+      renewCertificate: true,
+      viewCertificates: true,
+      invalidateCertificate: true,
+      deleteCertificate: true,
+    },
   },
   {
     id: 2,
@@ -21,5 +35,12 @@ export const MOCK_USERS: User[] = [
     email: "manager@example.com",
     role: "Manager",
     status: "Active",
+    permissions: {
+      createCertificate: true,
+      renewCertificate: true,
+      viewCertificates: true,
+      invalidateCertificate: false,
+      deleteCertificate: false,
+    },
   },
 ];

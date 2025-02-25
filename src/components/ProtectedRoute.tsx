@@ -13,7 +13,19 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     const checkAuth = () => {
       const user = localStorage.getItem('authenticated_user');
-      setIsAuthenticated(!!user);
+      if (user) {
+        try {
+          // Validate user data
+          const userData = JSON.parse(user);
+          if (userData.email && userData.role) {
+            setIsAuthenticated(true);
+            return;
+          }
+        } catch (e) {
+          console.error('Invalid user data in localStorage');
+        }
+      }
+      setIsAuthenticated(false);
     };
 
     checkAuth();

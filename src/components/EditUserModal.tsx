@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PermissionsManager } from "./users/PermissionsManager";
 
 interface EditUserModalProps {
   open: boolean;
@@ -27,28 +28,43 @@ interface EditUserModalProps {
     email: string;
     role: string;
     status: string;
+    permissions?: {
+      createCertificate: boolean;
+      renewCertificate: boolean;
+      viewCertificates: boolean;
+      invalidateCertificate: boolean;
+      deleteCertificate: boolean;
+    };
   };
 }
+
+const defaultPermissions = {
+  createCertificate: false,
+  renewCertificate: false,
+  viewCertificates: true,
+  invalidateCertificate: false,
+  deleteCertificate: false,
+};
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
+  const [permissions, setPermissions] = useState(defaultPermissions);
   const { toast } = useToast();
 
-  // Update state when user prop changes
   useEffect(() => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
       setRole(user.role);
       setStatus(user.status);
+      setPermissions(user.permissions || defaultPermissions);
     }
   }, [user]);
 
   const handleSubmit = async () => {
-    // Simulate backend request
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     toast({
@@ -57,6 +73,8 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
     });
     onOpenChange(false);
   };
+
+  const isAdmin = role === "Admin";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -107,6 +125,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
               </SelectContent>
             </Select>
           </div>
+          
+          <PermissionsManager
+            permissions={permissions}
+            onChange={setPermissions}
+            isAdmin={isAdmin}
+          />
+
           <Button onClick={handleSubmit} className="w-full">
             Update User
           </Button>
