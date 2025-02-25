@@ -1,6 +1,6 @@
 
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { User } from "@/types/user";
 
 interface PermissionsManagerProps {
@@ -47,7 +47,7 @@ export function PermissionsManager({ permissions, onChange, isAdmin }: Permissio
   const handlePermissionChange = (
     category: keyof typeof defaultPermissions,
     permission: string,
-    currentValue: boolean
+    checked: boolean
   ) => {
     if (!currentPermissions) return;
     
@@ -55,7 +55,7 @@ export function PermissionsManager({ permissions, onChange, isAdmin }: Permissio
       ...currentPermissions,
       [category]: {
         ...currentPermissions[category],
-        [permission]: !currentValue,
+        [permission]: checked,
       },
     });
   };
@@ -68,19 +68,21 @@ export function PermissionsManager({ permissions, onChange, isAdmin }: Permissio
     if (!sectionPermissions) return null;
     
     return (
-      <div className="space-y-4">
-        <div className="text-sm font-medium">{title}</div>
-        <div className="grid gap-4">
+      <div className="space-y-2">
+        <h4 className="font-medium">{title}</h4>
+        <div className="grid grid-cols-2 gap-2">
           {Object.entries(sectionPermissions).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between">
+            <div key={key} className="flex items-center space-x-2">
+              <Checkbox
+                id={`${category}-${key}`}
+                checked={value}
+                onCheckedChange={(checked) => 
+                  handlePermissionChange(category, key, checked as boolean)
+                }
+              />
               <Label htmlFor={`${category}-${key}`}>
                 {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
               </Label>
-              <Switch
-                id={`${category}-${key}`}
-                checked={value}
-                onCheckedChange={() => handlePermissionChange(category, key, value)}
-              />
             </div>
           ))}
         </div>
@@ -97,3 +99,4 @@ export function PermissionsManager({ permissions, onChange, isAdmin }: Permissio
     </div>
   );
 }
+
