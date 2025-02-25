@@ -126,11 +126,13 @@ export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) 
             </Select>
           </div>
           
-          <PermissionsManager
-            permissions={permissions}
-            onChange={setPermissions}
-            isAdmin={isAdmin}
-          />
+          {!isAdmin && (
+            <PermissionsManager
+              permissions={permissions}
+              onChange={setPermissions}
+              isAdmin={isAdmin}
+            />
+          )}
 
           <Button onClick={handleSubmit} className="w-full">
             Update User
