@@ -10,23 +10,10 @@ interface PermissionsManagerProps {
 }
 
 export function PermissionsManager({ permissions, onChange, isAdmin }: PermissionsManagerProps) {
+  // Return early if admin, showing no permissions interface
   if (isAdmin) {
     return null;
   }
-
-  const handlePermissionChange = (
-    category: keyof NonNullable<User['permissions']>,
-    permission: string,
-    currentValue: boolean
-  ) => {
-    onChange({
-      ...permissions,
-      [category]: {
-        ...permissions?.[category],
-        [permission]: !currentValue,
-      },
-    });
-  };
 
   const defaultPermissions = {
     certificates: {
@@ -54,31 +41,52 @@ export function PermissionsManager({ permissions, onChange, isAdmin }: Permissio
     },
   };
 
+  // Ensure we always have a valid permissions object
   const currentPermissions = permissions || defaultPermissions;
+
+  const handlePermissionChange = (
+    category: keyof typeof defaultPermissions,
+    permission: string,
+    currentValue: boolean
+  ) => {
+    if (!currentPermissions) return;
+    
+    onChange({
+      ...currentPermissions,
+      [category]: {
+        ...currentPermissions[category],
+        [permission]: !currentValue,
+      },
+    });
+  };
 
   const renderPermissionSection = (
     title: string,
     category: keyof typeof defaultPermissions,
-    permissions: Record<string, boolean>
-  ) => (
-    <div className="space-y-4">
-      <div className="text-sm font-medium">{title}</div>
-      <div className="grid gap-4">
-        {Object.entries(permissions).map(([key, value]) => (
-          <div key={key} className="flex items-center justify-between">
-            <Label htmlFor={`${category}-${key}`}>
-              {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-            </Label>
-            <Switch
-              id={`${category}-${key}`}
-              checked={value}
-              onCheckedChange={() => handlePermissionChange(category, key, value)}
-            />
-          </div>
-        ))}
+    sectionPermissions: Record<string, boolean>
+  ) => {
+    if (!sectionPermissions) return null;
+    
+    return (
+      <div className="space-y-4">
+        <div className="text-sm font-medium">{title}</div>
+        <div className="grid gap-4">
+          {Object.entries(sectionPermissions).map(([key, value]) => (
+            <div key={key} className="flex items-center justify-between">
+              <Label htmlFor={`${category}-${key}`}>
+                {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
+              </Label>
+              <Switch
+                id={`${category}-${key}`}
+                checked={value}
+                onCheckedChange={() => handlePermissionChange(category, key, value)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
