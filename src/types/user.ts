@@ -6,11 +6,29 @@ export interface User {
   role: string;
   status: string;
   permissions?: {
-    createCertificate: boolean;
-    renewCertificate: boolean;
-    viewCertificates: boolean;
-    invalidateCertificate: boolean;
-    deleteCertificate: boolean;
+    certificates: {
+      create: boolean;
+      delete: boolean;
+      invalidate: boolean;
+      extend: boolean;
+    };
+    users: {
+      create: boolean;
+      delete: boolean;
+      edit: boolean;
+      changePassword: boolean;
+    };
+    clients: {
+      add: boolean;
+      delete: boolean;
+      edit: boolean;
+      manageApiKeys: boolean;
+    };
+    applications: {
+      add: boolean;
+      delete: boolean;
+      edit: boolean;
+    };
   };
 }
 
@@ -22,11 +40,29 @@ export const MOCK_USERS: User[] = [
     role: "Admin",
     status: "Active",
     permissions: {
-      createCertificate: true,
-      renewCertificate: true,
-      viewCertificates: true,
-      invalidateCertificate: true,
-      deleteCertificate: true,
+      certificates: {
+        create: true,
+        delete: true,
+        invalidate: true,
+        extend: true,
+      },
+      users: {
+        create: true,
+        delete: true,
+        edit: true,
+        changePassword: true,
+      },
+      clients: {
+        add: true,
+        delete: true,
+        edit: true,
+        manageApiKeys: true,
+      },
+      applications: {
+        add: true,
+        delete: true,
+        edit: true,
+      },
     },
   },
   {
@@ -36,11 +72,29 @@ export const MOCK_USERS: User[] = [
     role: "Manager",
     status: "Active",
     permissions: {
-      createCertificate: true,
-      renewCertificate: true,
-      viewCertificates: true,
-      invalidateCertificate: false,
-      deleteCertificate: false,
+      certificates: {
+        create: true,
+        delete: false,
+        invalidate: true,
+        extend: true,
+      },
+      users: {
+        create: false,
+        delete: false,
+        edit: true,
+        changePassword: false,
+      },
+      clients: {
+        add: true,
+        delete: false,
+        edit: true,
+        manageApiKeys: true,
+      },
+      applications: {
+        add: true,
+        delete: false,
+        edit: true,
+      },
     },
   },
 ];

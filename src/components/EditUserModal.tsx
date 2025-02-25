@@ -18,32 +18,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PermissionsManager } from "./users/PermissionsManager";
+import { User } from "@/types/user";
 
 interface EditUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    status: string;
-    permissions?: {
-      createCertificate: boolean;
-      renewCertificate: boolean;
-      viewCertificates: boolean;
-      invalidateCertificate: boolean;
-      deleteCertificate: boolean;
-    };
-  };
+  user?: User;
 }
 
-const defaultPermissions = {
-  createCertificate: false,
-  renewCertificate: false,
-  viewCertificates: true,
-  invalidateCertificate: false,
-  deleteCertificate: false,
+const defaultPermissions: NonNullable<User['permissions']> = {
+  certificates: {
+    create: false,
+    delete: false,
+    invalidate: false,
+    extend: false,
+  },
+  users: {
+    create: false,
+    delete: false,
+    edit: false,
+    changePassword: false,
+  },
+  clients: {
+    add: false,
+    delete: false,
+    edit: false,
+    manageApiKeys: false,
+  },
+  applications: {
+    add: false,
+    delete: false,
+    edit: false,
+  },
 };
 
 export function EditUserModal({ open, onOpenChange, user }: EditUserModalProps) {
