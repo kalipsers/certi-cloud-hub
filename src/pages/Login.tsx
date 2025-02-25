@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import users from "@/data/users.json";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,51 +18,29 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const user = users.users.find(
+      (u) => u.email === email && u.password === password
+    );
 
-      if (error) throw error;
-
+    if (user) {
+      localStorage.setItem('authenticated_user', JSON.stringify(user));
       navigate("/");
-    } catch (error) {
+    } else {
       toast({
         title: "Error",
-        description: error.message,
+        description: "Invalid email or password",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Check your email for the confirmation link",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    toast({
+      title: "Info",
+      description: "Registration is not available in demo mode. Please use the provided demo accounts.",
+    });
   };
 
   const handleResetPassword = async () => {
@@ -75,24 +53,10 @@ const Login = () => {
       return;
     }
 
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Password reset link sent to your email",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Info",
+      description: "Password reset is not available in demo mode.",
+    });
   };
 
   return (
@@ -100,7 +64,7 @@ const Login = () => {
       <div className="mx-auto w-full max-w-sm space-y-6 p-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Welcome</h1>
-          <p className="text-gray-500">Sign in or create an account to continue</p>
+          <p className="text-gray-500">Sign in using demo credentials</p>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">

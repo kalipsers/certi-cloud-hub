@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -15,11 +14,8 @@ const ResetPassword = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if we have the access token in the URL
-    const hash = window.location.hash;
-    if (!hash || !hash.includes("access_token")) {
-      navigate("/login");
-    }
+    // Since we're not using real auth, redirect to login
+    navigate("/login");
   }, [navigate]);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -37,21 +33,15 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
-      });
-
-      if (error) throw error;
-
       toast({
-        title: "Success",
-        description: "Password has been reset successfully",
+        title: "Info",
+        description: "Password reset is not available in demo mode",
       });
       navigate("/login");
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "An error occurred",
         variant: "destructive",
       });
     } finally {

@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,18 +11,17 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+    const checkAuth = () => {
+      const user = localStorage.getItem('authenticated_user');
+      setIsAuthenticated(!!user);
     };
 
     checkAuth();
+    window.addEventListener('storage', checkAuth);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+    };
   }, []);
 
   if (isAuthenticated === null) {
